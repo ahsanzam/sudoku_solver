@@ -1,0 +1,8 @@
+
+sudoku_solver
+
+*.o
+
+*.plist
+
+solution.txt
