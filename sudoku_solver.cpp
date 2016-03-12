@@ -1,3 +1,7 @@
+/*
+  Author: Ahsan Zaman
+  Email: ahsanzam@usc.edu
+*/
 #include <fstream>
 #include "solver.h"
 
