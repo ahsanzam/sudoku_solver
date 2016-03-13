@@ -53,42 +53,51 @@ Solver::Solver(ifstream* infile)
 		}
 	}
 	prem = new vector<vector<int> >;
+
+	outfile.open("solution.txt");
 }
 
+Solver::~Solver(){
+	outfile.close();
+}
 //solver function
 int Solver::solve()
 {
 	bool only_choice = true;
+	//write_to_file();
+	//int x=1;
 	//first solve for all the boxes that have only one possibility
 	while(only_choice){
 		markup();
 		int filled_blanks = 0;
 		for(int i=0; i<prem->size(); i++){
-			if(prem->at(i).size() == 1){
+			if( prem->at(i).size() == 1){
 				bool found = false;
-				for(int j=1; !found && j<10; j++){
-					for(int k=1; !found && k<10; k++){
+				for(int j=1; (!found && j<10); j++){
+					for(int k=1; (!found && k<10); k++){
 						if( p(j,k) == i*-1 ){
 							puzzle[j-1][k-1] = prem->at(i).at(0);
-							horz[j-1][prem->at(i).at(0)] = true;
-							vert[k-1][prem->at(i).at(0)] = true;
-							squares[to_square(j,k)][prem->at(i).at(0)] = true;
+							horz[j-1][p(j,k)-1] = true;
+							vert[k-1][p(j,k)-1] = true;
+							squares[to_square(j,k)-1][p(j,k)-1] = true;
 							filled_blanks++;
-							found = true;
+							found = true; 
 						}
 					}
 				}
 			}
 		}
 		blanks -= filled_blanks;
+		cout << "Blanks:" << blanks << endl;
 		if(filled_blanks == 0) only_choice = false;
-		else{
-			while(prem->size() != 0) prem->pop_back();
+		else{ 
 			label_blanks();
+			while(prem->size() != 0) prem->pop_back();
 		}
 	}
 	//then solve using elimination 
 	//...somehow...
+
 	write_to_file();
 	return blanks;
 }
@@ -146,15 +155,14 @@ void Solver::label_blanks(){
 //writes result to file
 void Solver::write_to_file()
 {
-	ofstream outfile; 
-	outfile.open("solution.txt");
+
 	for(int i=1; i<10; i++){
 		for(int j=1; j<10; j++) outfile << p(i,j) << "\t";
 		outfile << "\n" ;
 	}
 
 	outfile << "\nBlanks: " << blanks << "\n" ;
-
+/*
 	//debugging purposes
 	for(int i=0; i<prem->size(); i++){
 		outfile << i << "\t: " ;
@@ -162,7 +170,6 @@ void Solver::write_to_file()
 			outfile << prem->at(i).at(j) << " ";
 		}
 		outfile << endl;
-	}
+	}*/
 
-	outfile.close();
 }

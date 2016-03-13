@@ -1,6 +1,6 @@
 #Makefile for Sudoku Solver
 
-all: clean sudoku_solver 
+all: sudoku_solver 
 
 sudoku_solver: solver.o
 	g++ -g -Wall solver.o sudoku_solver.cpp -o sudoku_solver

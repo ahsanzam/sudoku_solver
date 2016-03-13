@@ -11,13 +11,15 @@ using namespace std;
 class Solver{
 public:
 	Solver(ifstream* infile);
+	~Solver();
 	int solve();
 private:
 	//functs for easy access
 	bool h(int row, int num_to_check);
 	bool v(int col, int num_to_check);
 	bool s(int square, int num_to_check);
-	int p(int ver, int hor);
+	int p(int ver, int hor);	
+	ofstream outfile; 
 
 	//creates sets of possible values for each empty box
 	void markup();
