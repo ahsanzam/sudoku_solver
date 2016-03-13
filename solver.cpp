@@ -52,13 +52,43 @@ Solver::Solver(ifstream* infile)
 			}
 		}
 	}
-	prem = new vector<int>[blanks];
+	prem = new vector<vector<int> >;
 }
 
 //solver function
 int Solver::solve()
 {
-	markup();
+	bool only_choice = true;
+	//first solve for all the boxes that have only one possibility
+	while(only_choice){
+		markup();
+		int filled_blanks = 0;
+		for(int i=0; i<prem->size(); i++){
+			if(prem->at(i).size() == 1){
+				bool found = false;
+				for(int j=1; !found && j<10; j++){
+					for(int k=1; !found && k<10; k++){
+						if( p(j,k) == i*-1 ){
+							puzzle[j-1][k-1] = prem->at(i).at(0);
+							horz[j-1][prem->at(i).at(0)] = true;
+							vert[k-1][prem->at(i).at(0)] = true;
+							squares[to_square(j,k)][prem->at(i).at(0)] = true;
+							filled_blanks++;
+							found = true;
+						}
+					}
+				}
+			}
+		}
+		blanks -= filled_blanks;
+		if(filled_blanks == 0) only_choice = false;
+		else{
+			while(prem->size() != 0) prem->pop_back();
+			label_blanks();
+		}
+	}
+	//then solve using elimination 
+	//...somehow...
 	write_to_file();
 	return blanks;
 }
@@ -72,12 +102,17 @@ int Solver::p(int ver, int hor){return puzzle[ver-1][hor-1];}
 //creates sets of possible values for each empty box
 void Solver::markup()
 {
+	int index = 0;
 	for(int i=1; i<10; i++)
 		for(int j=1; j<10; j++)
-			if(p(i,j) <= 0)
+			if( p(i,j) <= 0 ){
+				vector<int> poss;
+				prem->push_back(poss);
 				for(int k=1; k<10; k++)
 					if((!h(i,k) && !v(j,k)) && !s(to_square(i,j),k))
-						prem[p(i,j)*-1].push_back(k); //error: multiple blanks on same rows
+						prem->at(index).push_back(k); 
+				index++;
+			}
 }
 
 //convert row,col number to square number
@@ -95,6 +130,19 @@ int Solver::to_square(int i, int j)
 	else return 0;
 }
 
+//labels all the blanks starting from zero
+void Solver::label_blanks(){
+	int blank_num = 0;
+	for(int i=1; i<10; i++){
+		for(int j=1; j<10; j++){
+			if( p(i,j) <= 0 ){
+				puzzle[i-1][j-1] = blank_num;
+				blank_num--;
+			}
+		}
+	}
+}
+
 //writes result to file
 void Solver::write_to_file()
 {
@@ -108,10 +156,10 @@ void Solver::write_to_file()
 	outfile << "\nBlanks: " << blanks << "\n" ;
 
 	//debugging purposes
-	for(int i=0; i<blanks; i++){
+	for(int i=0; i<prem->size(); i++){
 		outfile << i << "\t: " ;
-		for(int j=0; j<prem[i].size(); j++){
-			outfile << prem[i].at(j) << " ";
+		for(int j=0; j<prem->at(i).size(); j++){
+			outfile << prem->at(i).at(j) << " ";
 		}
 		outfile << endl;
 	}
