@@ -6,3 +6,7 @@ sudoku_solver
 *.plist
 
 solution.txt
+
+Sudoku Solver.app/Contents/Resources/empty.lproj
+
+Sudoku Solver.app/Contents/PkgInfo
